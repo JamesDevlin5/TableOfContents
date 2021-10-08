@@ -13,11 +13,13 @@ class Header:
         self._level = level
         self._line = line
         self._children = []
+        self.parent = None
 
     @classmethod
     def from_line(cls, line):
         """Constructs a header object from a single provided line of a document."""
-        return cls(*line.split(" ", 1))
+        level, content = line.split(" ", 1)
+        return cls(len(level), content)
 
     @property
     def level(self):
@@ -29,9 +31,19 @@ class Header:
         """The contents of this line; the string representation of this header."""
         return self._line
 
+    @property
+    def parent(self):
+        """Getter for the parent node. This node will inhabit the child list."""
+        return self._parent
+
+    @parent.setter
+    def parent(self, node):
+        self._parent = node
+
     def add_child(self, child):
         """Appends a child header to this parent header."""
         self._children.append(child)
+        child.parent = self
 
 
 def open_file(target):
@@ -94,14 +106,16 @@ def read_lines(lines):
         if line.startswith("#"):
             header = Header.from_line(line)
             doc.append(header)
-    for head in doc:
-        print(head.line)
+    return doc
 
 
 def main():
     """The main program runner."""
     args = make_arg_parser().parse_args()
-    read_lines(args.file)
+    lines = read_lines(args.file)
+    for header in lines:
+        spaces = "".join(" " for _ in range(header.level * 2))
+        print(f"{spaces}- {header.line}")
 
 
 if __name__ == "__main__":
