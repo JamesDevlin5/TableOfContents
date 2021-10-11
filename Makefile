@@ -9,3 +9,9 @@ fmt:
 
 testdoc:
 	@$(RUNNER) $(FILE) $(TEST_MD_FILE)
+
+clean:
+	$(RM) -r __pycache__ .pytest_cache
+
+.PHONY: clean
+
